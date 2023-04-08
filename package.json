@@ -1,6 +1,6 @@
 {
   "name": "@gibme/ipinfo",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "A simple IP information lookup helper using Team CYMRU services",
   "main": "dist/ipinfo.js",
   "types": "dist/ipinfo.d.ts",

@@ -18,20 +18,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { PrefixInfo } from './types';
-import Helpers from './helpers';
+/**
+ * ASN information
+ */
+export interface ASNEntry {
+    asn: number;
+    country: string;
+    registry: string;
+    allocated: Date;
+    name: string;
+}
 
 /**
- * Looks up information regarding the IP address supplied
- *
- * @param address
- * @param max_retries
+ * IP Prefix information including the ASN name (if available)
  */
-export const IPInfo = async (
-    address: string,
-    max_retries = 3
-): Promise<PrefixInfo | undefined> => {
-    return Helpers.getPrefix(address, max_retries);
-};
-
-export default IPInfo;
+export interface PrefixInfo {
+    address: string;
+    zone: string;
+    asn: number;
+    prefix: string;
+    country: string;
+    registry: string;
+    allocated: Date;
+    as?: ASNEntry;
+}

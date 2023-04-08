@@ -44,6 +44,7 @@ describe('Unit Tests', () => {
         it(`Test ${target.ip}`, async () => {
             const result = await IPInfo(target.ip);
 
+            assert.ok((result));
             assert.equal(result.asn, target.asn);
         });
     }
