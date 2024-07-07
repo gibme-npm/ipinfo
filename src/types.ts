@@ -42,3 +42,42 @@ export interface PrefixInfo {
     allocated: Date;
     as?: ASNEntry;
 }
+
+export namespace Workers {
+    export interface Response {
+        status: 'success' | 'fail';
+        message?: string;
+        query: string;
+        country: string;
+        countryCode: string;
+        region: string;
+        regionName: string;
+        city: string;
+        zip: string;
+        lat: number;
+        lon: number;
+        timezone: string;
+        isp: string;
+        org: string;
+        as: string;
+    }
+}
+
+export interface CheckIPResponse {
+    query: string;
+    country: string;
+    countryCode: string;
+    region: string;
+    regionName: string;
+    city: string;
+    zip: string;
+    lat: number;
+    lon: number;
+    timezone: string;
+    isp: string;
+    org?: string;
+    as: {
+        asn: number;
+        name: string;
+    }
+}

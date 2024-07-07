@@ -20,7 +20,7 @@
 
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import IPInfo from '../src/ipinfo';
+import { IPInfo, CheckIP } from '../src/ipinfo';
 
 describe('Unit Tests', () => {
     const targets: {ip: string, asn: number}[] = [{
@@ -40,12 +40,25 @@ describe('Unit Tests', () => {
         asn: 3356
     }];
 
-    for (const target of targets) {
-        it(`Test ${target.ip}`, async () => {
-            const result = await IPInfo(target.ip);
+    describe('CheckIP()', async () => {
+        for (const target of targets) {
+            it(`Test ${target.ip}`, async () => {
+                const result = await IPInfo(target.ip);
 
-            assert.ok((result));
-            assert.equal(result.asn, target.asn);
-        });
-    }
+                assert.ok((result));
+                assert.equal(result.asn, target.asn);
+            });
+        }
+    });
+
+    describe('IPInfo()', async () => {
+        for (const target of targets) {
+            it(`Test ${target.ip}`, async () => {
+                const result = await CheckIP(target.ip);
+
+                assert.ok((result));
+                assert.equal(result.as.asn, target.asn);
+            });
+        }
+    });
 });

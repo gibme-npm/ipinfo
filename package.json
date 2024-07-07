@@ -1,6 +1,6 @@
 {
   "name": "@gibme/ipinfo",
-  "version": "0.0.10",
+  "version": "1.0.0",
   "description": "A simple IP information lookup helper using Team CYMRU services",
   "main": "dist/ipinfo.js",
   "types": "dist/ipinfo.d.ts",
@@ -37,7 +37,9 @@
     "name": "Brandon Lehmann",
     "email": "brandonlehmann@gmail.com"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@gibme/fetch": "^1.0.7"
+  },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.7",
