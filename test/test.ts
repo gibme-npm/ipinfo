@@ -20,7 +20,7 @@
 
 import * as assert from 'assert';
 import { it, describe } from 'mocha';
-import { IPInfo, CheckIP } from '../src/ipinfo';
+import { IPInfo, CheckIP } from '../src';
 
 describe('Unit Tests', () => {
     const targets: {ip: string, asn: number}[] = [{

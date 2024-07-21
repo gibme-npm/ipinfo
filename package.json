@@ -1,9 +1,9 @@
 {
   "name": "@gibme/ipinfo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple IP information lookup helper using Team CYMRU services",
-  "main": "dist/ipinfo.js",
-  "types": "dist/ipinfo.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/*"
   ],
@@ -12,6 +12,7 @@
     "build": "yarn build:typescript",
     "build:docs": "./node_modules/.bin/typedoc",
     "build:typescript": "./node_modules/.bin/tsc",
+    "build:webpack": "./node_modules/.bin/auto-pack",
     "test": "yarn test:style && yarn test:typecheck && yarn test:mocha",
     "test:typecheck": "./node_modules/.bin/tsc --noEmit",
     "test:style": "yarn style",
@@ -19,7 +20,7 @@
     "style": "./node_modules/.bin/eslint src/**/*.ts test/**/*.ts",
     "fix-style": "./node_modules/.bin/eslint --fix src/**/*.ts test/**/*.ts",
     "fix:style": "yarn fix-style",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build && yarn build:webpack"
   },
   "repository": {
     "type": "git",
@@ -38,9 +39,16 @@
     "email": "brandonlehmann@gmail.com"
   },
   "dependencies": {
-    "@gibme/fetch": "^1.0.7"
+    "@gibme/fetch": "^1.0.14"
+  },
+  "webpack": {
+    "entry": {
+      "ipinfo": "./src/web.ts"
+    },
+    "filename": "[name].min.js"
   },
   "devDependencies": {
+    "@gibme/auto-pack": "^0.4.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.7",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
