@@ -1,6 +1,6 @@
 {
   "name": "@gibme/ipinfo",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple IP information lookup helper using Team CYMRU services",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -39,7 +39,7 @@
     "email": "brandonlehmann@gmail.com"
   },
   "dependencies": {
-    "@gibme/fetch": "^1.0.14"
+    "@gibme/fetch": "^1.1.1"
   },
   "webpack": {
     "entry": {
@@ -48,7 +48,7 @@
     "filename": "[name].min.js"
   },
   "devDependencies": {
-    "@gibme/auto-pack": "^0.4.2",
+    "@gibme/auto-pack": "^0.4.6",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.7",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
