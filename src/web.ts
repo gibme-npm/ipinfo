@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2024, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2016-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,8 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { CheckIPResponse, Workers } from './types';
-import fetch from '@gibme/fetch';
+import fetch from '@gibme/fetch/browser';
 
 /**
  * Looks up information regarding the IP address supplied; OR,
@@ -27,11 +26,10 @@ import fetch from '@gibme/fetch';
  * our client's IP address
  *
  * @param address
- * @constructor
  */
-export const CheckIP = async (
+export async function ipInfo (
     address?: string
-): Promise<CheckIPResponse | undefined> => {
+): Promise<ipInfo.Result | undefined> {
     const url = `https://ipinfo.hostmanager.workers.dev/${address ? `?ip=${address}` : ''}`;
 
     const response = await fetch.get(url);
@@ -40,7 +38,7 @@ export const CheckIP = async (
         return undefined;
     }
 
-    const json: Workers.Response = await response.json();
+    const json: ipInfo.Response = await response.json();
 
     if (json.status === 'fail') {
         return undefined;
@@ -52,21 +50,51 @@ export const CheckIP = async (
     const asn = parseInt(as.replace('AS', '')) || 0;
 
     return {
-        query: json.query,
-        country: json.country,
-        countryCode: json.countryCode,
-        region: json.region,
-        regionName: json.regionName,
-        city: json.city,
-        zip: json.zip,
-        lat: json.lat,
-        lon: json.lon,
-        timezone: json.timezone,
-        isp: json.isp,
-        org: json.org.length !== 0 ? json.org : undefined,
+        ...json,
         as: {
             asn,
             name
         }
     };
-};
+}
+
+export namespace ipInfo {
+    export type Response = {
+        status: 'success' | 'fail';
+        message?: string;
+        query: string;
+        country: string;
+        countryCode: string;
+        region: string;
+        regionName: string;
+        city: string;
+        zip: string;
+        lat: number;
+        lon: number;
+        timezone: string;
+        isp: string;
+        org: string;
+        as: string;
+    }
+
+    export type Result = {
+        query: string;
+        country: string;
+        countryCode: string;
+        region: string;
+        regionName: string;
+        city: string;
+        zip: string;
+        lat: number;
+        lon: number;
+        timezone: string;
+        isp: string;
+        org?: string;
+        as: {
+            asn: number;
+            name: string;
+        }
+    }
+}
+
+export default ipInfo;

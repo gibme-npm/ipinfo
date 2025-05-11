@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2024, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2016-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,25 +18,168 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { PrefixInfo } from './types';
-import Helpers from './helpers';
-import { CheckIP } from './web';
-export { CheckIP };
+import { resolveTxt } from 'dns/promises';
+export { ipInfo } from './web';
+
+/** @ignore */
+const sleep = async (timeout: number) =>
+    new Promise(resolve => setTimeout(resolve, timeout));
+
+/** @ignore */
+const countColons = (value: string): number => {
+    let count = 0;
+
+    value.replace(/:/g, val => { count++; return val; });
+
+    return count;
+};
 
 /**
- * Looks up information regarding the IP address supplied
+ * @ignore
+ * Expands compressed IPv6 address to uncompressed form
+ *
+ * @param value
+ */
+const expandIPv6 = (value: string): string => {
+    return value.replace(/::/, () => {
+        return `:${Array((7 - countColons(value)) + 1).join(':')}:`;
+    })
+        .split(':')
+        .map(val => {
+            return Array(4 - val.length).fill('0').join('') + val;
+        })
+        .join(':');
+};
+
+/**
+ * DNS TXT record resolution with automatic retries
+ *
+ * @param hostname
+ * @param max_retries
+ * @param retry
+ * @ignore
+ */
+const getTxtRecord = async (
+    hostname: string,
+    max_retries = 3,
+    retry = 0
+): Promise<string[][]> => {
+    try {
+        return await resolveTxt(hostname);
+    } catch (error: any) {
+        if (error.toString().toLowerCase().includes('refused') && retry < max_retries) {
+            await sleep(1000);
+
+            return getTxtRecord(hostname, max_retries, retry);
+        }
+
+        throw error;
+    }
+};
+
+/**
+ * Looks up information on the Autonomous System Number (ASN) via DNS
+ *
+ * @param as
+ * @param max_retries
+ * @ignore
+ */
+export async function getASN (
+    as: string | number,
+    max_retries = 3
+): Promise<getASN.Entry | undefined> {
+    if (typeof as === 'string') {
+        as = parseInt(as);
+    }
+
+    const records = await getTxtRecord(`AS${as}.asn.cymru.com`, max_retries);
+
+    if (records.length === 0 || records[0].length === 0) {
+        return undefined;
+    }
+
+    const [, country, registry, allocated, name] = records[0][0].split('|')
+        .map(elem => elem.trim());
+
+    return {
+        asn: as,
+        country: country.toUpperCase(),
+        registry: registry.toUpperCase(),
+        allocated: new Date(allocated),
+        name: name.split(',')[0]
+    };
+}
+
+export namespace getASN {
+    export type Entry = {
+        asn: number;
+        country: string;
+        registry: string;
+        allocated: Date;
+        name: string;
+    }
+}
+
+/**
+ * Looks up the prefix information via DNS
  *
  * @param address
  * @param max_retries
+ * @ignore
  */
-export const IPInfo = async (
+export async function getPrefix (
     address: string,
     max_retries = 3
-): Promise<PrefixInfo | undefined> => {
-    return Helpers.getPrefix(address, max_retries);
-};
+): Promise<getPrefix.Info | undefined> {
+    const original_address = address;
 
-export default {
-    IPInfo,
-    CheckIP
-};
+    address = address.split('/')[0]; // strip off any CIDR notation
+
+    if (address.includes(':')) {
+        address = expandIPv6(address);
+        address = address.split(':')
+            .join('')
+            .split('')
+            .reverse()
+            .join('.');
+        address = `${address}.origin6.asn.cymru.com`;
+    } else {
+        address = address.split('.')
+            .reverse()
+            .join('.');
+        address = `${address}.origin.asn.cymru.com`;
+    }
+
+    const records = await getTxtRecord(address, max_retries);
+
+    if (records.length === 0 || records[0].length === 0) {
+        return undefined;
+    }
+
+    const [asn, prefix, country, registry, allocated] = records[0][0].split('|')
+        .map(elem => elem.trim());
+
+    return {
+        address: original_address,
+        zone: address,
+        asn: parseInt(asn),
+        prefix,
+        country: country.toUpperCase(),
+        registry: registry.toUpperCase(),
+        allocated: new Date(allocated),
+        as: await getASN(asn)
+    };
+}
+
+export namespace getPrefix {
+    export type Info = {
+        address: string;
+        zone: string;
+        asn: number;
+        prefix: string;
+        country: string;
+        registry: string;
+        allocated: Date;
+        as?: getASN.Entry;
+    }
+}

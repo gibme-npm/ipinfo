@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2016-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { it, describe } from 'mocha';
-import { IPInfo, CheckIP } from '../src';
+import { ipInfo, getPrefix, getASN } from '../src';
 
 describe('Unit Tests', () => {
     const targets: {ip: string, asn: number}[] = [{
@@ -40,10 +40,10 @@ describe('Unit Tests', () => {
         asn: 3356
     }];
 
-    describe('CheckIP()', async () => {
+    describe('getPrefix()', async () => {
         for (const target of targets) {
             it(`Test ${target.ip}`, async () => {
-                const result = await IPInfo(target.ip);
+                const result = await getPrefix(target.ip);
 
                 assert.ok((result));
                 assert.equal(result.asn, target.asn);
@@ -51,13 +51,24 @@ describe('Unit Tests', () => {
         }
     });
 
-    describe('IPInfo()', async () => {
+    describe('ipInfo()', async () => {
         for (const target of targets) {
             it(`Test ${target.ip}`, async () => {
-                const result = await CheckIP(target.ip);
+                const result = await ipInfo(target.ip);
 
                 assert.ok((result));
                 assert.equal(result.as.asn, target.asn);
+            });
+        }
+    });
+
+    describe('getASN()', async () => {
+        for (const target of targets) {
+            it(`Test ${target.asn}`, async () => {
+                const result = await getASN(target.asn);
+
+                assert.ok((result));
+                assert.equal(result.asn, target.asn);
             });
         }
     });
