@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import './dns_helper';
 import { resolveTxt } from 'dns/promises';
 export { ipInfo } from './web';
 

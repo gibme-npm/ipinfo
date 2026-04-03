@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 import assert from 'assert';
-import { it, describe } from 'mocha';
+import { it, describe } from 'node:test';
 import { ipInfo, getPrefix, getASN } from '../src';
 
 describe('Unit Tests', () => {
